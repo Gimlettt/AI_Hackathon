@@ -17,23 +17,7 @@ from io import BytesIO
 from audio.record import record_voice
 from constant import *
 
-def mood_conversation():
-  # Load .env file from the root of the project
-  load_dotenv()
-
-  RECORDED_FILE_NAME = "audio/recorded_for_GPT.wav"
-  #RECORDED_FILE_NAME = 'audio/input_audio.wav'
-  record_voice(RECORD_SECONDS=7, OUTPUT_FILENAME = RECORDED_FILE_NAME)
-
-  # Read the audio file
-  with open(RECORDED_FILE_NAME, 'rb') as audio_file:
-      audio_input = audio_file.read()
-      # Encode the binary data to base64
-      encoded_audio = base64.b64encode(audio_input).decode('utf-8')
-
-
-  client = OpenAI(api_key = os.getenv('API_KEY'))
-
+def Chat_GPT_mood_analysis(client, encoded_audio):
   list_of_event_names = ["3A1 coursework", "3F2 FTR", "3C5 lab report", "General", "Hackathon"]
 
   PROMPT = f"""
@@ -46,9 +30,7 @@ def mood_conversation():
     "mood": Please analyze the audio input and select one of the task names. Then, rate the user's mood from 1 to 10, with 10 being the most happy. If the user is generally feeling happy or productive today and doesn't specify a task, select "General" as the event name.
   }}
   """
-
-  print(PROMPT)
-
+  
   completion = client.chat.completions.create(
       model="gpt-4o-audio-preview",
       modalities=["text"],
@@ -79,17 +61,38 @@ def mood_conversation():
   )
 
   print(completion.choices[0].message)
-
   returned_json = completion.choices[0].message.content
 
   print(f'returned_json =\n{returned_json}')
-
   try:
     # Try to parse the string to JSON (Python dictionary)
     parsed_json = json.loads(returned_json)
+#    MOOD_JSON_CONVERSION_ERROR = False
   except json.JSONDecodeError:
     # If there's an error, return the error constant
-    return MOOD_JSON_CONVERSION_ERROR
+    print("Error: MOOD_JSON_CONVERSION_ERROR, retrying")
+#    MOOD_JSON_CONVERSION_ERROR = True
+    return Chat_GPT_mood_analysis(client, encoded_audio)
+  return parsed_json
+
+def mood_conversation():
+  # Record the user's message
+  RECORDED_FILE_NAME = "audio/recorded_for_GPT.wav"
+  record_voice(RECORD_SECONDS=5, OUTPUT_FILENAME = RECORDED_FILE_NAME)
+  
+  # Read the audio file
+  with open(RECORDED_FILE_NAME, 'rb') as audio_file:
+      audio_input = audio_file.read()
+      # Encode the binary data to base64
+      encoded_audio = base64.b64encode(audio_input).decode('utf-8')
+
+  # Load .env file from the root of the project to get the API
+  load_dotenv()
+  client = OpenAI(api_key = os.getenv('API_KEY'))
+  
+  # Get the JSON with mood score
+  parsed_json = Chat_GPT_mood_analysis(client, encoded_audio)
+  
 
   # Now parsed_json is a dictionary, and you can access its keys like a regular dictionary
   print(f'parsed_json =\n{parsed_json}')
