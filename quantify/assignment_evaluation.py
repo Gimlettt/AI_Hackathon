@@ -27,17 +27,21 @@ def extract_text_from_pdf(pdf_path):
 
     return text.strip()
 
-def create_assignments_json(pdf_paths):
+def create_assignments_json(folder_path):
     assignments = []
+    # List all files in the folder and filter for PDFs
+    pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith(".pdf")]
 
-    for i in range(len(pdf_paths)):
+    for i, pdf_file in enumerate(pdf_files):
         print(f"\nAssignment {i+1}")
-        name = pdf_paths[i]
-        ddl = f"3/{random.randrange(11,24)}"
-        importance = random.randrange(0,10)
+        name = pdf_file  # You could modify this to use the file name without extension
+        ddl = f"1/{random.randrange(2, 15)}"
+        importance = random.randrange(0, 10)
         user_comment = input("Enter your comment: ")
 
-        content = extract_text_from_pdf(pdf_paths[i])
+        # Create full file path
+        pdf_path = os.path.join(folder_path, pdf_file)
+        content = extract_text_from_pdf(pdf_path)
 
         assignment = {
             "assignment_name": name,
@@ -46,7 +50,6 @@ def create_assignments_json(pdf_paths):
             "importance": importance,
             "user_comment": user_comment
         }
-
         assignments.append(assignment)
 
     with open('raw.json', 'w') as f:
@@ -117,7 +120,37 @@ def evaluate_duration(content):
     response_json = json.loads(raw_content)
     return response_json
 
+def classify_assignment(content):
+    prompt = f"""
+    Based on the assignment content provided below, determine whether the assignment is a (1)coursework (2)example paper, worksheet.
+    The answer should be either CW for coursework, or EP for example paper. Nothing else. 
+    Assignment content:
+    \"\"\"
+    {content}
+    \"\"\"
 
+    Respond in the following JSON format:
+    {{
+        "type": <answer>,
+    }}
+
+    Again, the answer should only be either "CW" or "EP"
+    """
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are an expert evaluator."},
+            {"role": "user", "content": prompt},
+        ],
+        model="gpt-4o",
+        temperature=0.3,
+    )
+    raw_content = response.choices[0].message.content.strip()
+    if raw_content.startswith("```"):
+        lines = raw_content.splitlines()
+        filtered_lines = [line for line in lines if not line.startswith("```")]
+        raw_content = "\n".join(filtered_lines).strip()
+    response_json = json.loads(raw_content)
+    return response_json
 
 def process_assignments(input_file, output_file):
     with open(input_file, 'r') as f:
@@ -129,6 +162,7 @@ def process_assignments(input_file, output_file):
         print(f"Evaluating assignment: {assignment['assignment_name']}...")
         difficulty_result = evaluate_difficulty(assignment['content'])
         duration_result = evaluate_duration(assignment['content'])
+        assignment_type = classify_assignment(assignment['content'])
 
         results.append({
             "assignment_name": assignment["assignment_name"],
@@ -137,7 +171,8 @@ def process_assignments(input_file, output_file):
             "difficulty": difficulty_result["difficulty"],
             "difficulty_explanation": difficulty_result["explanation"],
             "estimated_duration_hours": duration_result["duration_hours"],
-            "duration_explanation": duration_result["explanation"]
+            "duration_explanation": duration_result["explanation"],
+            "type": assignment_type["type"]
         })
 
     with open(output_file, 'w') as f:
@@ -151,5 +186,8 @@ if __name__ == "__main__":
     # assignments = []
     # pdfs = ["handouts/3F7 EP2.pdf", "handouts/3F8_FTR_edited.pdf", "handouts/CUES CUCaTS AI Agent Hackathon Rulebook.pdf", "handouts/examp3.pdf"]
     # create_assignments_json(pdfs)
+
+    pdf_folder = "/Users/maxlyu/Documents/AI_Hackathon/handouts"
+    create_assignments_json(pdf_folder)
 
     process_assignments("raw.json", "output.json")
