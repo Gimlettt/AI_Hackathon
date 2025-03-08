@@ -1,0 +1,38 @@
+[
+    {
+        "assignment_name": "handouts/3F7 EP2.pdf",
+        "DDL": "3/20",
+        "importance": 5,
+        "difficulty": 8,
+        "difficulty_explanation": "The assignment covers advanced topics in information theory, including concepts like log-likelihood ratios, relative entropy, Jensen's inequality, and channel capacity. It requires a strong understanding of probability, calculus, and mathematical proofs, making it challenging for students without a solid background in these areas.",
+        "estimated_duration_hours": 15.0,
+        "duration_explanation": "The assignment is complex, covering multiple advanced topics in information theory and coding, including proofs, calculations, and conceptual understanding. It requires a deep understanding of the subject, extensive problem-solving, and possibly additional research, which can take approximately 15 hours to complete."
+    },
+    {
+        "assignment_name": "handouts/3F8_FTR_edited.pdf",
+        "DDL": "3/15",
+        "importance": 9,
+        "difficulty": 8,
+        "difficulty_explanation": "This assignment is complex due to its requirement for a deep understanding of Bayesian inference, implementation of the Laplace approximation, and optimization techniques. It involves both theoretical understanding and practical coding skills, including the use of Python libraries for optimization and visualization, making it challenging for those not well-versed in these areas.",
+        "estimated_duration_hours": 20.0,
+        "duration_explanation": "This assignment involves implementing a Bayesian classifier, writing and testing Python code, analyzing results, and writing a detailed report. Given the complexity of the tasks, including coding, mathematical derivations, and report writing, it is estimated to take approximately 20 hours to complete."
+    },
+    {
+        "assignment_name": "handouts/CUES CUCaTS AI Agent Hackathon Rulebook.pdf",
+        "DDL": "3/20",
+        "importance": 3,
+        "difficulty": 7,
+        "difficulty_explanation": "The assignment involves developing an AI agent application to solve productivity issues, which requires a solid understanding of AI techniques, integration with productivity tools, and adherence to specific rules regarding the use of LLMs and APIs. The need for originality, scalability, and a polished user experience further increases the complexity, making it moderately challenging.",
+        "estimated_duration_hours": 31,
+        "duration_explanation": "The hackathon spans from 11:00 on March 8th to 21:00 on March 9th, totaling 34 hours. Considering breaks for meals and rest, the estimated active working time is approximately 31 hours."
+    },
+    {
+        "assignment_name": "handouts/examp3.pdf",
+        "DDL": "3/21",
+        "importance": 5,
+        "difficulty": 8,
+        "difficulty_explanation": "The assignment involves complex topics such as Markov Models, Hidden Markov Models, Gaussian AR(1) processes, and Linear Gaussian State Space Models, requiring a deep understanding of probabilistic modeling and statistical inference. The tasks demand deriving mathematical equations, optimizing parameters, and analyzing sequences, which are advanced and challenging for most undergraduate students.",
+        "estimated_duration_hours": 8.0,
+        "duration_explanation": "The assignment involves complex topics such as Markov Models, Hidden Markov Models, and Gaussian processes, requiring students to derive equations, analyze data, and apply probabilistic models. Given the depth of the questions and the need for mathematical derivations and model interpretations, it is estimated to take approximately 8 hours to complete."
+    }
+]

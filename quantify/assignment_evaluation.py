@@ -3,6 +3,7 @@ from openai import OpenAI
 from dotenv import load_dotenv  # Only needed if you use a .env file
 from PyPDF2 import PdfReader
 import json
+import random
 
 
 # Load environment variables from a .env file (if applicable)
@@ -31,8 +32,9 @@ def create_assignments_json(pdf_paths):
 
     for i in range(len(pdf_paths)):
         print(f"\nAssignment {i+1}")
-        name = input("Enter assignment name: ")
-        ddl = input("Enter deadline (DDL): ")
+        name = pdf_paths[i]
+        ddl = f"3/{random.randrange(11,24)}"
+        importance = random.randrange(0,10)
         user_comment = input("Enter your comment: ")
 
         content = extract_text_from_pdf(pdf_paths[i])
@@ -41,6 +43,7 @@ def create_assignments_json(pdf_paths):
             "assignment_name": name,
             "DDL": ddl,
             "content": content,
+            "importance": importance,
             "user_comment": user_comment
         }
 
@@ -130,6 +133,7 @@ def process_assignments(input_file, output_file):
         results.append({
             "assignment_name": assignment["assignment_name"],
             "DDL": assignment["DDL"],
+            "importance": assignment["importance"],
             "difficulty": difficulty_result["difficulty"],
             "difficulty_explanation": difficulty_result["explanation"],
             "estimated_duration_hours": duration_result["duration_hours"],
