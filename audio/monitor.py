@@ -41,7 +41,7 @@ def monitor_file_in_thread(file_path, directory="./audio/"):
         observer.join()
         print("Watchdog has stopped.")
 
-    thread = threading.Thread(target=run_observer, daemon=True)
+    thread = threading.Thread(target=run_observer, daemon=True, name="Thread file monitoring")
     thread.start()
     return observer, thread  # Return the observer so you can manually stop it if needed
 

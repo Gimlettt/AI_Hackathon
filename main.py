@@ -1,10 +1,9 @@
 # Public modules import
+import threading
 
 # Custom modules import
 from constant import *
 from audio.mood import get_mood_json
-from audio.monitor import monitor_file_in_thread
-import threading
 
 def main():
   

@@ -7,11 +7,6 @@ import threading
 import simpleaudio as sa
 from pydub import AudioSegment
 from io import BytesIO
-#import sys
-
-## Add the parent directory (project) to sys.path
-#parent_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))
-#sys.path.insert(0, parent_dir)
 
 
 # custom function
@@ -24,13 +19,33 @@ def Chat_GPT_mood_analysis(client, encoded_audio):
 
   PROMPT = f"""
   You are an assistant analyzing a user's mood and what event they are referring to based on their audio input.
-  Important: Return the results ONLY in a JSON format like this:\n\n{{\"event_name\": \"[Selected Task Name]\", \"mood\": [Mood Rating from 1 to 10]}}"
+  Important: Return the results ONLY in JSON formats like this:\n\n{{\"event_name\": \"[Selected Task Name]\", \"mood\": [Mood Rating from 1 to 10]}}"
+  Important: You can have multiple JSON answers, separated in comma, IF and ONLY IF you identify the user's mood to different events.
   Important: If you can't determine anything, return ONLY in the JSON format speciified above with "General" and a mood of 5
   Important: The event_name is chosen from a list which is given in the pseudo JSON format given as follows
   {{
     "event_name": select from {list_of_event_names} based on your analysis of the audio input
     "mood": Please analyze the audio input and select one of the task names. Then, rate the user's mood from 1 to 10, with 10 being the most happy. If the user is generally feeling happy or productive today and doesn't specify a task, select "General" as the event name.
   }}
+  Important: The following is ONLY for multiple entries, the JSONs should be returned in a Python list. i.e. enclosed by [].
+  [
+    {{
+      "event_name": first entry
+      "mood": first entry
+    }},{{
+      "event_name": POTENTIAL second entry if you can identify one
+      "mood": POTENTIAL second entry if you can identify one
+    }},
+    {{
+      "event_name": POTENTIAL third entry if you can identify one, you may return more entries if you identify more events and related mood
+      "mood": POTENTIAL third entry if you can identify one, you may return more entries if you identify more events and related mood
+    }}
+  ]
+  IMPORTANT: You are also given some discription to the events, as follows
+  "3A1 coursework": Fluid boundary layer lab report
+  "3F2 FTR": Control system design
+  "3C5 lab report": gyroscopic effects
+  "Hackathon": organised by CUES (Cambridge University Engineernig Society), about coding and using AI agents
   """
   
   completion = client.chat.completions.create(
@@ -77,10 +92,13 @@ def Chat_GPT_mood_analysis(client, encoded_audio):
     parsed_json = json.loads("""{"event_name": "General", "mood": 5}""")
   return parsed_json
 
+
+
+
 def mood_conversation():
   # Record the user's message
   RECORDED_FILE_NAME = "audio/recorded_for_GPT.wav"
-  record_voice(RECORD_SECONDS=5, OUTPUT_FILENAME = RECORDED_FILE_NAME)
+  record_voice(RECORD_SECONDS=20, OUTPUT_FILENAME = RECORDED_FILE_NAME)
   
   # Read the audio file
   with open(RECORDED_FILE_NAME, 'rb') as audio_file:
@@ -118,7 +136,7 @@ def mood_conversation():
               "content": [
                   {
                       "type": "text",
-                      "text": "Respond positively trying to cheer the user up. Be natural and concise!"
+                      "text": "Respond positively. Be natural and concise! Ideally no more than 10 seconds. Ask the user to clariify only if you're not sure of the user's mood."
                   },
                   {
                       "type": "input_audio",
@@ -154,9 +172,20 @@ def mood_conversation():
   # If everything is done correctly
   return NO_EXCEPTION
 
+
+# Listen to the user and returns a list of JSON rating the user's mood on each event
+# mood_json is a list of json.
+#   [
+#     {
+#       "event_name":
+#       "mood":
+#   ]
+# mood_conversation_thread is the thread that controls the mood scoring and audio feedback
+# the additioin of monitor_thread.join() in the code made sure that when mood_conversation_thread
+# is returned, the program has moved on to "waiting for ChatGPT to respond"
 def get_mood_json():
   observer, monitor_thread = monitor_file_in_thread("output.json", directory="./audio/")
-  mood_conversation_thread = threading.Thread(target=mood_conversation)
+  mood_conversation_thread = threading.Thread(target=mood_conversation, name="Thread mood conversation")
   mood_conversation_thread.start()
   monitor_thread.join()
   print("JSON file change detected! Thread has stopped")
@@ -165,8 +194,13 @@ def get_mood_json():
 
   with open("audio/output.json", "r") as file:
     mood_json = json.load(file)
-    
-  print(mood_json["event_name"])
-  print(mood_json["mood"])
+  
+  if isinstance(mood_json, list):  # Check if it's already a list
+    print("returned_json is already a Python list.")
+  elif isinstance(mood_json, dict):  # Check if it's a single dictionary
+    print("returned_json is a dictionary. Wrapping in a list.")
+    mood_json = [mood_json]  # Wrap in a list for consistency
+  
+  print(f"Length of the JSON list is {len(mood_json)}")
 
   return mood_json, mood_conversation_thread

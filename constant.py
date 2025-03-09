@@ -1,3 +1,7 @@
+# Global flag variables
+start_mood_conversation = False
+stop_recording = False
+
 # Definition for boolean constants
 MOOD_EXTRACTION_COMPLETED = False
 
