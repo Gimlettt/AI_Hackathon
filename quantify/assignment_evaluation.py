@@ -33,10 +33,9 @@ def create_assignments_json(folder_path):
     pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith(".pdf")]
 
     for i, pdf_file in enumerate(pdf_files):
-        print(f"\nAssignment {i+1}")
         name = os.path.splitext(os.path.basename(pdf_file))[0]
+        print(f"\nAssignment {i+1}: {name}")
         ddl = f"1/{random.randrange(2, 15)}"
-        importance = random.randrange(0, 10)
         user_comment = input("Enter your comment: ")
 
         # Create full file path
@@ -47,12 +46,12 @@ def create_assignments_json(folder_path):
             "assignment_name": name,
             "DDL": ddl,
             "content": content,
-            "importance": importance,
             "user_comment": user_comment
         }
         assignments.append(assignment)
 
-    with open('raw.json', 'w') as f:
+    json_file = os.path.join(os.path.dirname(__file__), "raw.json")
+    with open(json_file, 'w') as f:
         json.dump(assignments, f, indent=4)
 
 def evaluate_difficulty(content):
@@ -319,16 +318,28 @@ def manual_new_assignment(pdf_path, raw_json_path, eval_json_path):
         json.dump(eval_result, f, indent=4)
 
 
+def read_pdf():
+    pdf_folder = os.path.join(os.path.dirname(__file__), "..", "handouts")
+    create_assignments_json(pdf_folder)
 
-
+def quantify_pdf():
+    raw_json = os.path.join(os.path.dirname(__file__), "raw.json")
+    eval_json = os.path.join(os.path.dirname(__file__), "eval.json")
+    process_assignments(raw_json, eval_json)
 
 if __name__ == "__main__":
 
-    course_description_json = "/Users/maxlyu/Documents/AI_Hackathon/quantify/course_description.json"
+    # course_description_json = "/Users/maxlyu/Documents/AI_Hackathon/quantify/course_description.json"
+    course_description_json = os.path.join(os.path.dirname(__file__), "course_description.json")
+
+    read_pdf()
+    quantify_pdf()
 
     # pdf_folder = "/Users/maxlyu/Documents/AI_Hackathon/handouts"
     # create_assignments_json(pdf_folder)
 
-    process_assignments("raw_test.json", "eval_test.json")
+    # raw_json = os.path.join(os.path.dirname(__file__), "raw.json")
+    # eval_json = os.path.join(os.path.dirname(__file__), "eval.json")
+    # process_assignments(raw_json, eval_json)
 
     # manual_new_assignment("/Users/maxlyu/Documents/AI_Hackathon/quantify/4F13_cw1.pdf","/Users/maxlyu/Documents/AI_Hackathon/raw.json","/Users/maxlyu/Documents/AI_Hackathon/output.json")
