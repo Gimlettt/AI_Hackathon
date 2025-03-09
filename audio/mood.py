@@ -15,7 +15,23 @@ from audio.record import record_voice
 from constant import *
 
 def Chat_GPT_mood_analysis(client, encoded_audio):
-  list_of_event_names = ["3A1 coursework", "3F2 FTR", "3C5 lab report", "General", "Hackathon"]
+  # Get the absolute path of the current script (inside ./audio)
+  current_dir = os.path.dirname(os.path.abspath(__file__))
+
+  # Construct the path to the JSON file
+  json_path = os.path.join(current_dir, "..", "quantify", "course_description.json")
+
+  # Read the JSON file
+  with open(json_path, "r", encoding="utf-8") as file:
+      course_discription = json.load(file)
+
+  # Extract the keys from the JSON object
+  course_keys = list(course_discription.keys())
+  
+  course_keys.append("General")
+  list_of_event_names = course_keys
+
+#  list_of_event_names = ["3A1 coursework", "3F2 FTR", "3C5 lab report", "General", "Hackathon"]
 
   PROMPT = f"""
   You are an assistant analyzing a user's mood and what event they are referring to based on their audio input.
@@ -42,11 +58,9 @@ def Chat_GPT_mood_analysis(client, encoded_audio):
     }}
   ]
   IMPORTANT: You are also given some discription to the events, as follows
-  "3A1 coursework": Fluid boundary layer lab report
-  "3F2 FTR": Control system design
-  "3C5 lab report": gyroscopic effects
-  "Hackathon": organised by CUES (Cambridge University Engineernig Society), about coding and using AI agents
+  {course_discription}
   """
+  
   
   completion = client.chat.completions.create(
       model="gpt-4o-audio-preview",
@@ -79,6 +93,10 @@ def Chat_GPT_mood_analysis(client, encoded_audio):
 
   print(completion.choices[0].message)
   returned_json = completion.choices[0].message.content
+  # Check if the string starts and ends with triple backticks
+  if returned_json.startswith("```") and returned_json.endswith("```"):
+    # Remove the leading and trailing triple backticks
+    returned_json = returned_json[3:-3]
 
   print(f'returned_json =\n{returned_json}')
   try:
@@ -98,7 +116,7 @@ def Chat_GPT_mood_analysis(client, encoded_audio):
 def mood_conversation():
   # Record the user's message
   RECORDED_FILE_NAME = "audio/recorded_for_GPT.wav"
-  record_voice(RECORD_SECONDS=20, OUTPUT_FILENAME = RECORDED_FILE_NAME)
+  record_voice(RECORD_SECONDS=DEFAULT_RECORDING_TIME, OUTPUT_FILENAME = RECORDED_FILE_NAME)
   
   # Read the audio file
   with open(RECORDED_FILE_NAME, 'rb') as audio_file:
