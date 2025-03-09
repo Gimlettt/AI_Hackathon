@@ -1,0 +1,14 @@
+3F8 EP
+This module is quiet hard and especially the math behind it. It requires some revision, i guess, before I can fully grasp all the concepts coherently.
+
+4F13
+This is a pretty difficult, graduate level course that I am taking. I really want to perform well, but am not very confident
+
+AI Agent Hackathon
+This is an event I want to participate in. I know some ML and AI, but not very familiar with Agentic AI
+
+3F7
+This module is relatively easy. I think the professor is great in explaning the concepts. I am confident.
+
+3F8 FTR
+This is a full technical report that we have to write. I haven't looked at it, but my friends said this is quiet time consuming and not very easy
