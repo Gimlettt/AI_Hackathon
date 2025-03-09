@@ -324,7 +324,11 @@ def manual_new_assignment(pdf_path, raw_json_path, eval_json_path):
 
 if __name__ == "__main__":
 
-    course_description_json = "/Users/maxlyu/Documents/AI_Hackathon/quantify/course_description.json"
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the relative path to course_description.json
+    course_description_json = os.path.join(script_dir, "course_description.json")
 
     # pdf_folder = "/Users/maxlyu/Documents/AI_Hackathon/handouts"
     # create_assignments_json(pdf_folder)
