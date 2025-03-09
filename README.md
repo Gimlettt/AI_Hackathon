@@ -10,7 +10,7 @@ python quantity/assignment_evaluation.py
 ```
 - Genrates a .json file with diffiiculty, importance, etc. values for each assignment
 
-## 2. User Mood
+## 2. User Mood and Task Suggestions
 Asks the user about daily mood and uses this, together with the objective scores generated in step 1, to dynamically suggest three most suitable tasks to do now. 
 ```
 python scorer.py
