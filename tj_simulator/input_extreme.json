@@ -1,0 +1,38 @@
+[
+    {
+        "assignment_name": "3F7 EP",
+        "DDL": "1/3",
+        "duration": "4",
+        "difficulty": "7.5",
+        "importance": "8",
+        "mood": "6",
+        "explanation": "The assignment consists of 12 complex questions involving advanced concepts in information theory, such as log-likelihood ratios, relative entropy, and channel capacity, which require a solid understanding of mathematical proofs and derivations. Given the student's familiarity with the concepts but noting the difficulty of the module, each question likely requires more than half an hour, especially those involving proofs and derivations, resulting in an estimated total of 40 hours."
+    },
+    {
+        "assignment_name": "3F8 FTR",
+        "DDL": "1/5",
+        "duration": "48",
+        "difficulty": "9",
+        "importance": "9",
+        "mood": "4",
+        "explanation": "The assignment involves implementing a Bayesian binary classifier using the Laplace approximation, writing Python code, and performing a grid search for hyperparameter tuning. It requires understanding complex mathematical concepts, coding, and interpreting results, which is time-consuming and challenging for a third-year undergraduate student."
+    },
+    {
+        "assignment_name": "AI Agent Hackathon",
+        "DDL": "1/7",
+        "duration": "30",
+        "difficulty": "6.5",
+        "importance": "7",
+        "mood": "8",
+        "explanation": "The hackathon requires building a functional AI agent application, which involves coding, integrating APIs, and ensuring compliance with rules. Given the student's limited familiarity with Agentic AI, the need for teamwork, and the requirement to document and present the project, approximately 40 hours is a reasonable estimate for preparation and participation."
+    },
+    {
+        "assignment_name": "3F8 EP3",
+        "DDL": "1/13",
+        "duration": "40",
+        "difficulty": "7.5",
+        "importance": "8",
+        "mood": "5",
+        "explanation": "The assignment involves complex mathematical concepts, including Markov Models, Hidden Markov Models, and Gaussian processes, which require a solid understanding of probability and statistics. The student has indicated difficulty with the mathematical aspects, suggesting additional time for revision. The assignment includes multiple parts with detailed derivations and model descriptions, likely requiring coding and thorough analysis, which adds to the time needed."
+    }
+]

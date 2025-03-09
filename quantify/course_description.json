@@ -1,0 +1,11 @@
+{
+    "3F7": "3F7 Information Theory and Coding: The aims of the course are to: To introduce students to the principles of information theory, data compression, and error-correction, which form the foundations of modern communication and information processing systems.",
+    "3F8": "3F8 Inference: The aims of the course are to: Provide a thorough introduction into the topic of statistical inference including maximum-likelihood and Bayesian approaches. Introduce inference algorithms for regression, classification, clustering and sequence modelling. Introduce basic concepts in optimisation and dynamic programming",
+    "4C11": "4C11 Data-driven and learning based methods in mechanics and materials",
+    "4E12": "4E12 Project Management: The aims of the course are to: introduce the principal elements of project management; equipping students with the basic skills to enable them to manage a project and to operate effectively as part of a project team.",
+    "4F10": "4F10 Deep Learning: The aims of the course are to: This module aims to teach the basic concepts of deep learning and forms of structure that can be used for generative and discriminative models. In addition, the use of models for classifying structured data, such as speech and language, will be discussed",
+    "4F13": "4F13 Porbabilistic Machine Lnearing: The aims of the course are to: introduce students to basic concepts in machine learning, focusing on statistical methods for supervised and unsupervised learning.",
+    "4M21": "4M21 Software Engineering and Design: This course will provide an understanding of the technical and management processes involved in the design of software systems, including human-computer interaction. Software engineering concepts are considered at a range of scales, from the manipulation of object-orientated concepts, through architectural design components, to the building of large complex software systems.",
+    "4M26": "4M26 Algorithms and Data Structures: Introduce the principles behind algorithm and data structure design and evaluation.",
+    "Other_CW": "Any other coursework, events, project that doesn't closely relate to any of the courses."
+}

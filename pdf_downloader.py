@@ -26,8 +26,7 @@ def configure_browser(download_directory):
     }
     chrome_options.add_experimental_option("prefs", prefs)
     
-    # Optional: Run headless (no UI)
-    # chrome_options.add_argument("--headless")  # Uncomment to run without browser UI
+
     
     return webdriver.Chrome(options=chrome_options)
 
@@ -88,11 +87,11 @@ def download_pdfs_from_cambridge_moodle(url, download_directory):
             else:
                 print(f"No downloadable files found in course {course_id}")
             
-            # Return to home page
+
             back_button = driver.find_element(By.XPATH, "//a[contains(@class, 'back-btn')]")
             back_button.click()
             
-            # Wait for home page to load
+
             WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located((By.ID, "home-page"))
             )
