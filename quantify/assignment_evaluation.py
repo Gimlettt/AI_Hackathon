@@ -88,6 +88,44 @@ def evaluate_difficulty(content):
     response_json = json.loads(raw_content)
     return response_json
 
+def evaluate_importance(content, user_comment, type):
+    prompt = f"""
+    Based on the assignment content and user's comment, evaluate how important this assignment is. User comment might express student's opinion about the importance of assignment.
+    In addition, the assignment's importance is related to its type. If the assignment is a CW (coursework), it counters toward final grade and should be treated with more attention.
+    If the assignment is a EP (example paper), it is a ungraded worksheet that doesn't affect final grade. 
+
+    Provide a difficulty score between 0 (least important) and 10 (most important) with a brief explanation (1 sentence).
+
+    Assignment content:
+    \"\"\"
+    {content}
+    \"\"\"
+
+    The assignment is of {type} type. 
+    Respond in the following JSON format:
+    {{
+        "importance": <difficulty_score>,
+        "explanation": "<explanation_here>"
+    }}
+    """
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are an expert evaluator."},
+            {"role": "user", "content": prompt},
+        ],
+        model="gpt-4o",
+        temperature=0.3,
+    )
+    raw_content = response.choices[0].message.content.strip()
+    # Remove Markdown code fences if present
+    if raw_content.startswith("```"):
+        lines = raw_content.splitlines()
+        filtered_lines = [line for line in lines if not line.startswith("```")]
+        raw_content = "\n".join(filtered_lines).strip()
+    response_json = json.loads(raw_content)
+    return response_json
+
+
 def evaluate_duration(content):
     prompt = f"""
     Based on the assignment content provided below, estimate how long it would take a student to complete this assignment.
@@ -163,11 +201,12 @@ def process_assignments(input_file, output_file):
         difficulty_result = evaluate_difficulty(assignment['content'])
         duration_result = evaluate_duration(assignment['content'])
         assignment_type = classify_assignment(assignment['content'])
+        importance_result = evaluate_importance(assignment['content'], assignment["user_comment"], assignment_type["type"])
 
         results.append({
             "assignment_name": assignment["assignment_name"],
             "DDL": assignment["DDL"],
-            "importance": assignment["importance"],
+            "importance": importance_result["importance"],
             "difficulty": difficulty_result["difficulty"],
             "difficulty_explanation": difficulty_result["explanation"],
             "estimated_duration_hours": duration_result["duration_hours"],
@@ -180,14 +219,81 @@ def process_assignments(input_file, output_file):
 
     print(f"Evaluation complete. Results saved to {output_file}")
 
+def manual_new_assignment(pdf_path, raw_json_path, eval_json_path):
+    ## (1) Update the raw.json
+    if os.path.exists(raw_json_path):
+        with open(raw_json_path, 'r') as f:
+            try:
+                assignments = json.load(f)
+            except json.JSONDecodeError:
+                assignments = []
+    else:
+        assignments = []
+    
+    print(f"Adding new assignment from PDF: {pdf_path}")
+
+    name = pdf_path
+    ddl = f"1/{random.randrange(2,15)}"
+    content = extract_text_from_pdf(pdf_path)
+    importance = random.randrange(0,10)
+    user_comment = input("How do you feel about the assignment?")
+
+    new_assignment = {
+        "assignment_name": name,
+        "DDL": ddl,
+        "content": content,
+        "importance": importance,
+        "user_comment": user_comment
+    }
+
+    assignments.append(new_assignment)
+    
+    # Write the updated list back to the JSON file
+    with open(raw_json_path, 'w') as f:
+        json.dump(assignments, f, indent=4)
+
+
+    ## (2) Update the eval.json (including the evaluation results from LLM)
+    if os.path.exists(eval_json_path):
+        with open(eval_json_path, 'r') as f:
+            try:
+                eval_result = json.load(f)
+            except json.JSONDecodeError:
+                eval_result = []
+    else:
+        eval_result = []
+    
+
+    print(f"Evaluating assignment: {name}...")
+    difficulty_result = evaluate_difficulty(content)
+    duration_result = evaluate_duration(content)
+    assignment_type = classify_assignment(content)
+
+
+    eval_result.append({
+        "assignment_name": name,
+        "DDL": ddl,
+        "importance": importance,
+        "difficulty": difficulty_result["difficulty"],
+        "difficulty_explanation": difficulty_result["explanation"],
+        "estimated_duration_hours": duration_result["duration_hours"],
+        "duration_explanation": duration_result["explanation"],
+        "type": assignment_type["type"]
+    })
+    
+    # Write the updated list back to the JSON file
+    with open(eval_json_path, 'w') as f:
+        json.dump(eval_result, f, indent=4)
+
+
+
+
 
 if __name__ == "__main__":
 
-    # assignments = []
-    # pdfs = ["handouts/3F7 EP2.pdf", "handouts/3F8_FTR_edited.pdf", "handouts/CUES CUCaTS AI Agent Hackathon Rulebook.pdf", "handouts/examp3.pdf"]
-    # create_assignments_json(pdfs)
+    # pdf_folder = "/Users/maxlyu/Documents/AI_Hackathon/handouts"
+    # create_assignments_json(pdf_folder)
 
-    pdf_folder = "/Users/maxlyu/Documents/AI_Hackathon/handouts"
-    create_assignments_json(pdf_folder)
+    process_assignments("raw_test.json", "eval_test.json")
 
-    process_assignments("raw.json", "output.json")
+    # manual_new_assignment("/Users/maxlyu/Documents/AI_Hackathon/quantify/4F13_cw1.pdf","/Users/maxlyu/Documents/AI_Hackathon/raw.json","/Users/maxlyu/Documents/AI_Hackathon/output.json")
