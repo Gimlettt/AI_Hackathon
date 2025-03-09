@@ -210,7 +210,7 @@ def process_assignments(input_file, output_file):
             "importance": importance_result["importance"],
             "difficulty": difficulty_result["difficulty"],
             "difficulty_explanation": difficulty_result["explanation"],
-            "estimated_duration_hours": duration_result["duration_hours"],
+            "duration": duration_result["duration_hours"],
             "duration_explanation": duration_result["explanation"],
             "module": module,
             "type": assignment_type["type"]
