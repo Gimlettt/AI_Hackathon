@@ -74,13 +74,6 @@ def explain_priority(json_file):
     Please provide a brief and human-like explanation for the user that does not focus too much on the exact numbers, but rather on the overall message. For example, explain that one assignment might need to be tackled immediately because it's very urgent or close to its deadline, while another might be important but less pressing. The response should be friendly, casual, and clear.
     Provide your answer in plain text.
 
-    Respond in the following JSON format:
-    {{
-        "reason_rank_1": <reason_for_doing_this_assignment_first>,
-        "reason_rank_2": "<reason_for_doing_this_assignment_second>",
-        "reason_rank_3": "<reason_for_doing_this_assignment_third>"
-    }}
-
     """
     
     # Make the API call
@@ -96,6 +89,14 @@ def explain_priority(json_file):
     # Clean up the response (remove Markdown code fences if necessary)
     raw_content = response.choices[0].message.content.strip()
 
+    if raw_content.startswith("```"):
+        lines = raw_content.splitlines()
+        filtered_lines = [line for line in lines if not line.startswith("```")]
+        raw_content = "\n".join(filtered_lines).strip()
+    
+    return raw_content
+
+"""
     # Remove markdown fences if they exist
     if raw_content.startswith("```"):
         raw_content = "\n".join([line for line in raw_content.splitlines() if not line.startswith("```")]).strip()
@@ -109,8 +110,9 @@ def explain_priority(json_file):
         json.dump(explanation_json, f, indent=4)
 
     print(f"Explanation saved to {output_filename}")
-
+"""
 
 if __name__ == "__main__":
     explanation_text = explain_priority("/Users/maxlyu/Documents/AI_Hackathon/suggestion/tasks_20250101_0900.json")
+    print("Explanation:\n", explanation_text)
 
