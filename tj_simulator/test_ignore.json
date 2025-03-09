@@ -1,0 +1,137 @@
+{
+    "coursework_tasks": [
+      {
+        "coursework_id": 1,
+        "title": "Introduction to Programming Assignment",
+        "estimated_hours": 5,
+        "deadline": "2025-01-01T18:00"
+      },
+      {
+        "coursework_id": 2,
+        "title": "Data Structures Project",
+        "estimated_hours": 15,
+        "deadline": "2025-01-02T18:00"
+      },
+      {
+        "coursework_id": 3,
+        "title": "Database Systems Midterm",
+        "estimated_hours": 12,
+        "deadline": "2025-01-03T18:00"
+      },
+      {
+        "coursework_id": 4,
+        "title": "Operating Systems Lab",
+        "estimated_hours": 20,
+        "deadline": "2025-01-04T18:00"
+      },
+      {
+        "coursework_id": 5,
+        "title": "Networking Quiz",
+        "estimated_hours": 6,
+        "deadline": "2025-01-05T18:00"
+      },
+      {
+        "coursework_id": 6,
+        "title": "Software Engineering Group Report",
+        "estimated_hours": 10,
+        "deadline": "2025-01-06T18:00"
+      },
+      {
+        "coursework_id": 7,
+        "title": "Artificial Intelligence Research Paper",
+        "estimated_hours": 25,
+        "deadline": "2025-01-07T18:00"
+      },
+      {
+        "coursework_id": 8,
+        "title": "Machine Learning Assignment",
+        "estimated_hours": 18,
+        "deadline": "2025-01-08T18:00"
+      },
+      {
+        "coursework_id": 9,
+        "title": "Cybersecurity Case Study",
+        "estimated_hours": 14,
+        "deadline": "2025-01-09T18:00"
+      },
+      {
+        "coursework_id": 10,
+        "title": "Human-Computer Interaction Presentation",
+        "estimated_hours": 8,
+        "deadline": "2025-01-10T18:00"
+      }
+    ],
+    "activity_tags": [
+      {
+        "activity_id": 1,
+        "title": "Exercise",
+        "day": "2025-01-02",
+        "start_time": "07:30",
+        "end_time": "08:00"
+      },
+      {
+        "activity_id": 2,
+        "title": "Dating",
+        "day": "2025-01-04",
+        "start_time": "19:00",
+        "end_time": "20:00"
+      },
+      {
+        "activity_id": 3,
+        "title": "Meditation",
+        "day": "2025-01-03",
+        "start_time": "07:00",
+        "end_time": "07:30"
+      },
+      {
+        "activity_id": 4,
+        "title": "Lunch with Friend",
+        "day": "2025-01-05",
+        "start_time": "12:00",
+        "end_time": "12:30"
+      },
+      {
+        "activity_id": 5,
+        "title": "Reading for Leisure",
+        "day": "2025-01-06",
+        "start_time": "20:30",
+        "end_time": "21:00"
+      },
+      {
+        "activity_id": 6,
+        "title": "Coffee Break",
+        "day": "2025-01-07",
+        "start_time": "15:00",
+        "end_time": "15:30"
+      },
+      {
+        "activity_id": 7,
+        "title": "Gym",
+        "day": "2025-01-08",
+        "start_time": "18:00",
+        "end_time": "18:30"
+      },
+      {
+        "activity_id": 8,
+        "title": "Walk Outside",
+        "day": "2025-01-09",
+        "start_time": "08:30",
+        "end_time": "09:00"
+      },
+      {
+        "activity_id": 9,
+        "title": "Family Call",
+        "day": "2025-01-10",
+        "start_time": "21:00",
+        "end_time": "21:30"
+      },
+      {
+        "activity_id": 10,
+        "title": "Hobby Time",
+        "day": "2025-01-01",
+        "start_time": "19:00",
+        "end_time": "19:30"
+      }
+    ]
+  }
+  
