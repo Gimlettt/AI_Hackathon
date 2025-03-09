@@ -5,16 +5,21 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 from datetime import datetime, timedelta
+import sys
+import os
 
 class TaskManagerApp:
-    def __init__(self, root):
+    def __init__(self, root, json_file=None):
         self.root = root
         self.root.title("Task Manager")
         self.root.geometry("1000x600")
         self.root.configure(bg="#f0f0f0")
         
+        # Use provided JSON file path or default
+        self.json_file = json_file or "suggestion/suggestion.json"
+        
         # Load task data
-        self.tasks = self.load_tasks("tasks.json")
+        self.tasks = self.load_tasks(self.json_file)
         
         # Sort tasks by urgency (highest first)
         self.tasks.sort(key=lambda x: x["urgency"], reverse=True)
@@ -31,33 +36,11 @@ class TaskManagerApp:
     def load_tasks(self, filename):
         try:
             with open(filename, 'r') as file:
+                print(f"Successfully loaded data from {filename}")
                 return json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            print("what the hell")
-            # Return sample data if file not found or invalid
-            return [
-                {
-                    "assignment_name": "examp3.pdf",
-                    "rank": 1,
-                    "importance": 5,
-                    "urgency": 9,
-                    "mood": 7
-                },
-                {
-                    "assignment_name": "CUES CUCaTS AI Agent Hackathon Rulebook.pdf",
-                    "rank": 2,
-                    "importance": 9,
-                    "urgency": 6,
-                    "mood": 5
-                },
-                {
-                    "assignment_name": "3F7 EP2.pdf",
-                    "rank": 3,
-                    "importance": 2,
-                    "urgency": 7,
-                    "mood": 2
-                }
-            ]
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Error loading JSON file {filename}: {e}")
+            raise
     
     def create_layout(self):
         # Main container
@@ -151,6 +134,7 @@ class TaskManagerApp:
     def create_gantt_chart(self, parent_frame):
         # Create figure for the Gantt chart
         fig, ax = plt.subplots(figsize=(10, 3), dpi=100)
+        fig.patch.set_facecolor('white')
         
         # Sample data for Gantt chart
         tasks = [task["assignment_name"].split('.')[0] for task in self.top_tasks]
@@ -162,12 +146,12 @@ class TaskManagerApp:
         # Generate random durations between 1 and 5 days
         durations = [np.random.randint(1, 6) for _ in range(len(tasks))]
         
-        # Create Gantt chart
-        y_positions = range(len(tasks))
-        colors = ['#4CAF50', '#2196F3', '#FFC107']
+        # Define colors for tasks
+        colors = ['red', 'blue', 'green']
         
+        # Create the Gantt chart with simple colored bars
         for i, (task, start_date, duration) in enumerate(zip(tasks, start_dates, durations)):
-            end_date = start_date + timedelta(days=duration)
+            # Draw the bar
             ax.barh(
                 i, 
                 duration, 
@@ -175,26 +159,48 @@ class TaskManagerApp:
                 height=0.5, 
                 align='center',
                 color=colors[i % len(colors)],
-                alpha=0.8
+                edgecolor='black',
+                linewidth=1
             )
             
-            # Add task labels
+            # Add task label to the left of the bar
             ax.text(
-                np.datetime64(start_date) - np.timedelta64(12, 'h'), 
+                np.datetime64(start_date) - np.timedelta64(1, 'D'), 
                 i, 
                 task, 
                 ha='right', 
                 va='center',
                 fontsize=9
             )
+            
+            # Add duration text on the bar
+            ax.text(
+                np.datetime64(start_date) + np.timedelta64(int(duration/2), 'D'),
+                i,
+                f"{duration} days",
+                ha='center',
+                va='center',
+                fontsize=8,
+                color='white' if i != 2 else 'black',  # Ensure text is visible against bar color
+                fontweight='bold'
+            )
         
         # Format the chart
         ax.set_yticks([])
-        ax.set_title('Task Timeline', fontsize=12)
+        ax.set_title('Task Timeline', fontsize=12, fontweight='bold')
         ax.grid(axis='x', alpha=0.3)
         
         # Format x-axis to show dates
         ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%m/%d'))
+        
+        # Add some padding to the left to make room for task names
+        date_min = np.datetime64(now - timedelta(days=3))
+        date_max = np.datetime64(now + timedelta(days=max(durations) + 5))
+        ax.set_xlim(left=date_min, right=date_max)
+        
+        # Remove chart border
+        for spine in ['top', 'right', 'left']:
+            ax.spines[spine].set_visible(False)
         
         # Adjust layout
         plt.tight_layout()
@@ -207,7 +213,24 @@ class TaskManagerApp:
         # Draw the canvas
         canvas.draw()
 
-if __name__ == "__main__":
+def run_gui(json_file=None):
+    """
+    Run the Task Manager GUI with the specified JSON file.
+    
+    Args:
+        json_file (str, optional): Path to the JSON file containing task data.
+                                   Defaults to None (which will use the default path).
+    """
     root = tk.Tk()
-    app = TaskManagerApp(root)
+    app = TaskManagerApp(root, json_file)
     root.mainloop()
+
+# If the script is run directly, check for command line arguments
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        # Use the first command line argument as the JSON file path
+        json_file = sys.argv[1]
+        run_gui(json_file)
+    else:
+        # No command line argument, use default
+        run_gui()
