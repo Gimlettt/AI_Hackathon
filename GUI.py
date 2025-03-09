@@ -33,6 +33,7 @@ class TaskManagerApp:
             with open(filename, 'r') as file:
                 return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
+            print("what the hell")
             # Return sample data if file not found or invalid
             return [
                 {
