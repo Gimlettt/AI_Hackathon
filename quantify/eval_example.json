@@ -4,19 +4,21 @@
         "DDL": "1/13",
         "importance": 3,
         "difficulty": 8,
-        "difficulty_explanation": "The assignment involves advanced topics in sequence modeling and Monte Carlo methods, requiring a deep understanding of Markov models, Hidden Markov Models (HMMs), and Gaussian processes. It includes deriving mathematical equations, optimizing parameters, and applying probabilistic models, which are complex tasks typically suited for students with a strong background in statistics and machine learning.",
-        "estimated_duration_hours": 10.0,
-        "duration_explanation": "The assignment involves complex topics in sequence modeling and Monte Carlo methods, requiring understanding of Markov models, Hidden Markov Models, and Gaussian processes. It includes deriving equations, analyzing data, and applying probabilistic models, which would likely take a student with a good grasp of these concepts around 10 hours to complete thoroughly.",
+        "difficulty_explanation": "The assignment involves complex topics such as Markov Models, Hidden Markov Models, and Gaussian AR(1) processes, requiring a strong understanding of probabilistic modeling and mathematical derivations. The tasks include deriving parameters, optimizing likelihoods, and applying advanced concepts like Kalman filters, which are challenging and require a high level of expertise in statistical inference and sequence modeling.",
+        "estimated_duration_hours": 8.5,
+        "duration_explanation": "The assignment involves complex topics such as Markov models, Hidden Markov Models, and Gaussian state space models, requiring a deep understanding of probabilistic modeling and mathematical derivations. It includes multiple parts with derivations, model descriptions, and analysis, likely taking a student with a solid background in these areas around 8.5 hours to complete thoroughly.",
+        "module": "3F8",
         "type": "EP"
     },
     {
         "assignment_name": "CUES CUCaTS AI Agent Hackathon Rulebook.pdf",
         "DDL": "1/8",
-        "importance": 5,
+        "importance": 3,
         "difficulty": 7,
-        "difficulty_explanation": "The assignment is moderately difficult due to the requirement to build a functional AI agent application within a limited timeframe of two days. Participants must address a specific productivity challenge, adhere to strict fairness rules regarding the use of LLMs, and ensure their solution is scalable, innovative, and user-friendly. Additionally, the need to document the development process and present the project adds complexity.",
-        "estimated_duration_hours": 31,
-        "duration_explanation": "The hackathon spans from 11:00 AM on March 8th to 6:00 PM on March 9th, totaling 31 hours. This includes time for coding, meals, and presentations, with the majority of the time dedicated to project development.",
+        "difficulty_explanation": "The assignment is moderately difficult due to the need to develop a functional AI agent application within a limited timeframe of two days. Participants must address a real productivity problem, adhere to specific fairness rules regarding AI usage, and ensure scalability and user experience. The requirement to document the development process and present the project adds to the complexity.",
+        "estimated_duration_hours": 30.0,
+        "duration_explanation": "The hackathon spans over two days, with a total of 31 hours allocated for coding and project work. Considering breaks for meals and other activities, the effective working time is approximately 30 hours. This includes time for brainstorming, coding, debugging, and preparing the presentation.",
+        "module": "Other_CW",
         "type": "EP"
     },
     {
@@ -24,9 +26,10 @@
         "DDL": "1/11",
         "importance": 3,
         "difficulty": 8,
-        "difficulty_explanation": "The assignment covers advanced topics in information theory and coding, requiring a deep understanding of concepts like log-likelihood ratios, relative entropy, Jensen's inequality, and channel capacity. The problems involve complex mathematical proofs and computations, making it challenging for students without a strong background in probability and information theory.",
-        "estimated_duration_hours": 12.0,
-        "duration_explanation": "The assignment involves complex topics in information theory and coding, requiring students to solve mathematical problems, prove inequalities, and compute channel capacities. Given the depth of the questions and the need for understanding advanced concepts, it is estimated to take around 12 hours to complete.",
+        "difficulty_explanation": "The assignment covers advanced topics in information theory and coding, requiring a strong understanding of concepts like log-likelihood ratios, relative entropy, mutual information, and channel capacity. It involves complex mathematical proofs, derivations, and the application of theorems, making it challenging for students without a solid background in probability and information theory.",
+        "estimated_duration_hours": 15.0,
+        "duration_explanation": "The assignment involves complex topics in information theory and coding, requiring students to demonstrate understanding through proofs, calculations, and conceptual explanations. Each question demands a deep engagement with the material, including derivations, applying laws, and proving inequalities, which can be time-consuming. Additionally, some questions require familiarity with specific theorems and the ability to apply them in novel contexts, further increasing the time needed.",
+        "module": "3F7",
         "type": "EP"
     },
     {
@@ -34,9 +37,10 @@
         "DDL": "1/4",
         "importance": 10,
         "difficulty": 8,
-        "difficulty_explanation": "This assignment is complex as it requires a deep understanding of Bayesian inference, the Laplace approximation, and logistic classification. It involves implementing mathematical concepts in Python, optimizing hyperparameters, and interpreting results, which demands advanced statistical and programming skills.",
-        "estimated_duration_hours": 25.0,
-        "duration_explanation": "This assignment involves implementing a Bayesian binary classifier, writing and testing Python code, performing grid search for hyper-parameter tuning, and producing a detailed technical report. Given the complexity of the tasks, including understanding the Laplace approximation, coding, and analysis, it is estimated to take approximately 25 hours to complete.",
+        "difficulty_explanation": "This assignment is quite challenging as it requires a deep understanding of Bayesian inference, the Laplace approximation, and logistic classification. It involves implementing complex mathematical concepts in Python, optimizing hyperparameters, and interpreting results, which demands a strong background in statistics, machine learning, and programming.",
+        "estimated_duration_hours": 20.0,
+        "duration_explanation": "This assignment requires implementing a Bayesian classifier, coding in Python, running experiments, and writing a detailed report. It involves understanding complex concepts like the Laplace approximation, optimizing hyperparameters, and interpreting results, which are time-consuming tasks for a student.",
+        "module": "3F8",
         "type": "CW"
     },
     {
@@ -44,9 +48,10 @@
         "DDL": "1/12",
         "importance": 10,
         "difficulty": 8,
-        "difficulty_explanation": "This assignment requires a strong understanding of Gaussian Processes, including the use of specific covariance functions and hyperparameter optimization. It involves both theoretical understanding and practical application using the GPML toolbox in MATLAB or Octave. The tasks require interpreting results, comparing models, and understanding complex statistical concepts, which can be challenging for those not deeply familiar with probabilistic machine learning.",
+        "difficulty_explanation": "This assignment requires a deep understanding of Gaussian Processes and their application using the GPML toolbox in MATLAB/Octave. It involves complex tasks such as hyperparameter optimization, understanding covariance functions, and interpreting statistical results, which are advanced topics in probabilistic machine learning. Additionally, the assignment demands a strong ability to explain and interpret results, adding to its complexity.",
         "estimated_duration_hours": 15.0,
-        "duration_explanation": "The assignment involves multiple tasks including data loading, model training with different covariance functions, hyperparameter optimization, and interpretation of results. Each task requires understanding of Gaussian Processes, use of the GPML toolbox, and careful analysis of outputs, which is time-consuming. Additionally, writing concise explanations and interpretations for each part will add to the duration.",
+        "duration_explanation": "The assignment involves understanding Gaussian Processes, using the GPML toolbox, and performing multiple tasks including data loading, model training, hyperparameter optimization, and result interpretation. Each task requires careful analysis and explanation, which can be time-consuming, especially for students unfamiliar with the concepts. Additionally, the need to generate plots and interpret results adds to the complexity and time required.",
+        "module": "4F13",
         "type": "CW"
     }
 ]

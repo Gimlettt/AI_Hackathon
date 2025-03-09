@@ -34,7 +34,7 @@ def create_assignments_json(folder_path):
 
     for i, pdf_file in enumerate(pdf_files):
         print(f"\nAssignment {i+1}")
-        name = pdf_file  # You could modify this to use the file name without extension
+        name = os.path.splitext(os.path.basename(pdf_file))[0]
         ddl = f"1/{random.randrange(2, 15)}"
         importance = random.randrange(0, 10)
         user_comment = input("Enter your comment: ")
@@ -158,7 +158,7 @@ def evaluate_duration(content):
     response_json = json.loads(raw_content)
     return response_json
 
-def classify_assignment(content):
+def classify_assignment_type(content):
     prompt = f"""
     Based on the assignment content provided below, determine whether the assignment is a (1)coursework (2)example paper, worksheet.
     The answer should be either CW for coursework, or EP for example paper. Nothing else. 
@@ -200,8 +200,9 @@ def process_assignments(input_file, output_file):
         print(f"Evaluating assignment: {assignment['assignment_name']}...")
         difficulty_result = evaluate_difficulty(assignment['content'])
         duration_result = evaluate_duration(assignment['content'])
-        assignment_type = classify_assignment(assignment['content'])
+        assignment_type = classify_assignment_type(assignment['content'])
         importance_result = evaluate_importance(assignment['content'], assignment["user_comment"], assignment_type["type"])
+        module = classify_assignment_module(course_dict_json=course_description_json, assignment_content=assignment['content'])
 
         results.append({
             "assignment_name": assignment["assignment_name"],
@@ -211,6 +212,7 @@ def process_assignments(input_file, output_file):
             "difficulty_explanation": difficulty_result["explanation"],
             "estimated_duration_hours": duration_result["duration_hours"],
             "duration_explanation": duration_result["explanation"],
+            "module": module,
             "type": assignment_type["type"]
         })
 
@@ -218,6 +220,35 @@ def process_assignments(input_file, output_file):
         json.dump(results, f, indent=4)
 
     print(f"Evaluation complete. Results saved to {output_file}")
+
+def classify_assignment_module(course_dict_json, assignment_content):
+
+    with open(course_dict_json, 'r') as f:
+        course_dict = json.load(f)
+        keys_str = ", ".join(course_dict.keys())
+
+    prompt = f"""
+    You are an academic advisor. Given the following dictionary of courses and their descriptions:
+    {json.dumps(course_dict_json, indent=4)}
+    
+    Classify the following assignment content into one of the courses. Respond with exactly one of the following course codes (and nothing else): {keys_str}. Please follow this rule strictly.
+    
+    Assignment content:
+    \"\"\"
+    {assignment_content}
+    \"\"\"
+    """
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are an expert academic advisor."},
+            {"role": "user", "content": prompt}
+        ],
+        model="gpt-4o",
+        temperature=0.3,
+    )
+    return response.choices[0].message.content.strip()
+
+
 
 def manual_new_assignment(pdf_path, raw_json_path, eval_json_path):
     ## (1) Update the raw.json
@@ -267,7 +298,8 @@ def manual_new_assignment(pdf_path, raw_json_path, eval_json_path):
     print(f"Evaluating assignment: {name}...")
     difficulty_result = evaluate_difficulty(content)
     duration_result = evaluate_duration(content)
-    assignment_type = classify_assignment(content)
+    assignment_type = classify_assignment_type(content)
+    module = classify_assignment_module(course_dict_json=course_description_json, assignment_content=content)
 
 
     eval_result.append({
@@ -278,6 +310,7 @@ def manual_new_assignment(pdf_path, raw_json_path, eval_json_path):
         "difficulty_explanation": difficulty_result["explanation"],
         "estimated_duration_hours": duration_result["duration_hours"],
         "duration_explanation": duration_result["explanation"],
+        "module": module,
         "type": assignment_type["type"]
     })
     
@@ -290,6 +323,8 @@ def manual_new_assignment(pdf_path, raw_json_path, eval_json_path):
 
 
 if __name__ == "__main__":
+
+    course_description_json = "/Users/maxlyu/Documents/AI_Hackathon/quantify/course_description.json"
 
     # pdf_folder = "/Users/maxlyu/Documents/AI_Hackathon/handouts"
     # create_assignments_json(pdf_folder)
