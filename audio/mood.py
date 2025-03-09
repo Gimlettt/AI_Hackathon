@@ -3,6 +3,7 @@ import os
 from openai import OpenAI
 import base64
 import json
+import threading
 import simpleaudio as sa
 from pydub import AudioSegment
 from io import BytesIO
@@ -14,6 +15,7 @@ from io import BytesIO
 
 
 # custom function
+from audio.monitor import monitor_file_in_thread
 from audio.record import record_voice
 from constant import *
 
@@ -70,9 +72,9 @@ def Chat_GPT_mood_analysis(client, encoded_audio):
 #    MOOD_JSON_CONVERSION_ERROR = False
   except json.JSONDecodeError:
     # If there's an error, return the error constant
-    print("Error: MOOD_JSON_CONVERSION_ERROR, retrying")
+    print("Error: MOOD_JSON_CONVERSION_ERROR, defaulting to the base case")
 #    MOOD_JSON_CONVERSION_ERROR = True
-    return Chat_GPT_mood_analysis(client, encoded_audio)
+    parsed_json = json.loads("""{"event_name": "General", "mood": 5}""")
   return parsed_json
 
 def mood_conversation():
@@ -116,7 +118,7 @@ def mood_conversation():
               "content": [
                   {
                       "type": "text",
-                      "text": "Respond positively trying to cheer the user up."
+                      "text": "Respond positively trying to cheer the user up. Be natural and concise!"
                   },
                   {
                       "type": "input_audio",
@@ -151,3 +153,20 @@ def mood_conversation():
   
   # If everything is done correctly
   return NO_EXCEPTION
+
+def get_mood_json():
+  observer, monitor_thread = monitor_file_in_thread("output.json", directory="./audio/")
+  mood_conversation_thread = threading.Thread(target=mood_conversation)
+  mood_conversation_thread.start()
+  monitor_thread.join()
+  print("JSON file change detected! Thread has stopped")
+  MOOD_EXTRACTION_COMPLETED, MOOD_JSON_CONVERSION_ERROR = False, False # Reset the monitor
+  
+
+  with open("audio/output.json", "r") as file:
+    mood_json = json.load(file)
+    
+  print(mood_json["event_name"])
+  print(mood_json["mood"])
+
+  return mood_json, mood_conversation_thread
