@@ -52,7 +52,7 @@ def explain_priority(json_file):
     
     new_assignment = filter_json(assignments, keys_to_keep)
 
-    print(f"NEW: {new_assignment}")
+    # print(f"NEW: {new_assignment}")
     
     # Construct the prompt
     prompt = f"""
