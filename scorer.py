@@ -8,9 +8,9 @@ import os
 # 添加项目根目录到Python路径，以便导入quantify模块
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from quantify.merge_mood import merge_mood_json
-
-
 from audio.mood import get_mood_json
+# 导入explain_priority函数
+from suggestion.suggestion import explain_priority
 
 
 
@@ -20,9 +20,32 @@ WORK_END_HOUR = 19
 # Define fixed deadline time
 DEADLINE_HOUR = 19
 
+# 添加颜色常量定义
+# ANSI颜色代码
+class Colors:
+    RESET = "\033[0m"
+    BLACK = "\033[30m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    BACKGROUND_BLACK = "\033[40m"
+    BACKGROUND_RED = "\033[41m"
+    BACKGROUND_GREEN = "\033[42m"
+    BACKGROUND_YELLOW = "\033[43m"
+    BACKGROUND_BLUE = "\033[44m"
+    BACKGROUND_MAGENTA = "\033[45m"
+    BACKGROUND_CYAN = "\033[46m"
+    BACKGROUND_WHITE = "\033[47m"
 
 class TaskScheduler:
-    def __init__(self, tasks_data=None, start_date=None, output_dir="score_output_test"):
+    def __init__(self, tasks_data=None, start_date=None, output_dir="score_output_test", 
+                 urgency_weight=0.5, importance_weight=0.3, mood_weight=0.2):
         """
         Initialize the task scheduler with tasks data and start date
         
@@ -30,6 +53,9 @@ class TaskScheduler:
         tasks_data (list): List of task dictionaries
         start_date (datetime): Starting date and time for the scheduler
         output_dir (str): Directory to save task snapshots
+        urgency_weight (float): Weight for urgency in task scoring (0-1)
+        importance_weight (float): Weight for importance in task scoring (0-1)
+        mood_weight (float): Weight for mood in task scoring (0-1)
         """
         self.start_date = start_date if start_date else datetime.now().replace(hour=9, minute=0, second=0, microsecond=0)
         self.current_date = self.start_date
@@ -37,6 +63,11 @@ class TaskScheduler:
         self.work_start_hour = WORK_START_HOUR
         self.work_end_hour = WORK_END_HOUR
         self.deadline_hour = DEADLINE_HOUR
+        
+        # 存储权重值
+        self.urgency_weight = urgency_weight
+        self.importance_weight = importance_weight
+        self.mood_weight = mood_weight
         
         # Initialize tasks if provided
         if tasks_data:
@@ -426,9 +457,6 @@ class TaskScheduler:
         Returns:
         list: List of tuples (task_index, task_dict) or empty list if no active tasks
         """
-        # 尝试更新心情值
-        self.update_mood_values()
-        
         active_tasks = []
         for i, task in enumerate(self.tasks):
             # If current time is before deadline and task is not completed
@@ -445,8 +473,10 @@ class TaskScheduler:
             importance = float(task.get('importance', 5))  # Default to 5 if not provided
             mood = float(task.get('mood', 5))  # Default to 5 if not provided
             
-            # Calculate weighted score (adjust weights as needed)
-            weighted_score = 0.5 * urgency + 0.3 * importance + 0.2 * mood
+            # 使用实例变量中存储的权重值
+            weighted_score = (self.urgency_weight * urgency/10 + 
+                             self.importance_weight * importance + 
+                             self.mood_weight * mood)
             task['weighted_score'] = weighted_score
         
         # Sort by weighted score and return top N
@@ -581,25 +611,26 @@ class TaskScheduler:
         continue_simulation = True
         first_iteration = True
         
-        # Ensure current time is within working hours
+        # 确保当前时间在工作时间内
         self.current_date = self.get_next_working_time(self.current_date)
-        print(f"Adjusted start time: {self.current_date.strftime('%Y-%m-%d %H:%M')}")
+        print(f"{Colors.BOLD}{Colors.GREEN}Adjusted start time: {self.current_date.strftime('%Y-%m-%d %H:%M')}{Colors.RESET}")
         
-        # 在模拟开始时尝试更新心情值
-        self.update_mood_values()
-        
-        print("\nProgram starting, work schedule will be checked at the first 9:00 AM...")
+        print(f"\n{Colors.BOLD}{Colors.BLUE}Program starting, work schedule will be checked at the first 9:00 AM...{Colors.RESET}")
         
         while continue_simulation:
-            # Check if during working hours
+            # 检查是否在工作时间内
             if self.is_working_hours(self.current_date):
-                print(f"\nCurrent time point: {self.current_date.strftime('%Y-%m-%d %H:%M')}")
+                print(f"\n{Colors.BOLD}{Colors.CYAN}Current time point: {self.current_date.strftime('%Y-%m-%d %H:%M')}{Colors.RESET}")
                 
-                # Check if it's 9:00 AM of a new day (adjust work hours at 9:00 AM every day)
+                # 检查是否是新的一天的9:00（每天9:00调整工作时间）
                 if self.current_date.hour == 9 and self.current_date.minute == 0:
-                    print("\nNew day begins, checking today's work hour arrangement...")
+                    print(f"\n{Colors.BOLD}{Colors.YELLOW}New day begins, checking today's work hour arrangement...{Colors.RESET}")
                     
-                    # Filter future tasks (deadlines after current date and not completed)
+                    # 在这里添加心情更新 - 每天早上9:00更新一次
+                    self.update_mood_values()
+                    print(f"{Colors.GREEN}Updated mood values for today's tasks{Colors.RESET}")
+                    
+                    # 过滤未来任务（截止日期在当前日期之后且未完成）
                     future_tasks = [task for task in self.tasks if task['deadline'] > self.current_date and 
                                     float(task['duration']) - task.get('completed_work', 0) > 0]
                     
@@ -642,34 +673,52 @@ class TaskScheduler:
                     break
                 
                 # Display status of all tasks
-                print("\nCurrent task status:")
+                print(f"\n{Colors.BOLD}{Colors.MAGENTA}Current task status:{Colors.RESET}")
                 for task_status in self.get_task_status():
                     if not task_status['is_completed']:
                         i = task_status['index']
-                        print(f"Task {i+1}: {task_status['name']}")
+                        print(f"{Colors.CYAN}Task {i+1}: {task_status['name']}{Colors.RESET}")
                         print(f"  Accumulated work time: {task_status['completed_work']} hours")
-                        print(f"  Remaining work time: {task_status['duration_left']} hours")
+                        print(f"  Remaining work time: {Colors.YELLOW}{task_status['duration_left']} hours{Colors.RESET}")
                         print(f"  Effective work time before deadline: {self.tasks[i].get('time_to_deadline', 0):.2f} hours")
-                        print(f"  Urgency: {task_status['urgency']:.2f}%")
+                        
+                        # 根据紧急程度使用不同颜色
+                        urgency = task_status['urgency']
+                        if urgency > 70:
+                            urgency_color = Colors.RED
+                        elif urgency > 40:
+                            urgency_color = Colors.YELLOW
+                        else:
+                            urgency_color = Colors.GREEN
+                        
+                        print(f"  Urgency: {urgency_color}{task_status['urgency']:.2f}%{Colors.RESET}")
                 
                 # Save current status to JSON file
                 snapshot_file = self.save_tasks_snapshot(self.current_date)
                 print(f"Saved task snapshot to: {snapshot_file}")
                 
                 # Display top 3 suggestions based on weighted score
-                print("\nTop 3 suggested tasks based on weighted score:")
+                print(f"\n{Colors.BOLD}{Colors.GREEN}Top 3 suggested tasks based on weighted score:{Colors.RESET}")
                 for i, (task_idx, task) in enumerate(top_urgent_tasks):
-                    print(f"{i+1}. Task {task_idx+1}: {task.get('name', task.get('assignment_name', 'Unnamed Task'))}")
-                    print(f"   Weighted Score: {task['weighted_score']:.2f}")
-                    print(f"   Urgency: {task['urgency']:.2f}%")
+                    print(f"{Colors.BOLD}{i+1}. Task {task_idx+1}: {task.get('name', task.get('assignment_name', 'Unnamed Task'))}{Colors.RESET}")
+                    print(f"   Weighted Score: {Colors.CYAN}{task['weighted_score']:.2f}{Colors.RESET}")
+                    print(f"   Urgency: {Colors.YELLOW}{task['urgency']:.2f}%{Colors.RESET}")
                     print(f"   Importance: {task.get('importance', 5)}")
-                    print(f"   Mood: {task.get('mood', 5)}")
+                    print(f"   Mood: {Colors.MAGENTA}{task.get('mood', 5)}{Colors.RESET}")
                     print(f"   Remaining work: {task.get('duration_left', 0)} hours")
                     print(f"   Deadline: {task['deadline'].strftime('%Y-%m-%d %H:%M')}")
                 
+                # 使用explain_priority函数提供详细解释
+                try:
+                    print(f"\n{Colors.BOLD}{Colors.BLUE}Why these tasks are prioritized:{Colors.RESET}")
+                    explanation = explain_priority(snapshot_file)
+                    print(f"{Colors.YELLOW}{explanation}{Colors.RESET}")
+                except Exception as e:
+                    print(f"{Colors.RED}无法生成任务优先级解释: {str(e)}{Colors.RESET}")
+                
                 if first_iteration:
                     # First iteration, ask user to choose which task to work on
-                    print("\nWhich task would you like to work on for the next 2 hours? (Enter 1-3, or press Enter for the most urgent):")
+                    print(f"\n{Colors.BOLD}{Colors.BLUE}Which task would you like to work on for the next 2 hours? (Enter 1-3, or press Enter for the most urgent):{Colors.RESET}")
                     user_choice = input().strip()
                     
                     # Default to most urgent if no input
@@ -685,15 +734,15 @@ class TaskScheduler:
                     # Work on selected task
                     self.work_on_task(task_idx, 2)
                     
-                    print(f"\nWill begin processing task: {selected_task.get('name', selected_task.get('assignment_name', 'Unnamed Task'))}")
-                    print(f"\nCompleted 2 hours of work on this task from 09:00-11:00")
+                    print(f"\n{Colors.GREEN}Will begin processing task: {selected_task.get('name', selected_task.get('assignment_name', 'Unnamed Task'))}{Colors.RESET}")
+                    print(f"\n{Colors.GREEN}Completed 2 hours of work on this task from 09:00-11:00{Colors.RESET}")
                     print(f"  Accumulated work time: {selected_task['completed_work']} hours")
                     print(f"  Remaining work time: {selected_task['duration_left']} hours")
                     print(f"  Effective work time before deadline: {selected_task['time_to_deadline']:.2f} hours")
                     first_iteration = False
                 else:
                     # Normal processing - ask user to choose which task to work on
-                    print("\nWhich task would you like to work on for the next 2 hours? (Enter 1-3, or press Enter for the most urgent):")
+                    print(f"\n{Colors.BOLD}{Colors.BLUE}Which task would you like to work on for the next 2 hours? (Enter 1-3, or press Enter for the most urgent):{Colors.RESET}")
                     user_choice = input().strip()
                     
                     # Default to most urgent if no input
@@ -709,7 +758,7 @@ class TaskScheduler:
                     # Work on selected task
                     self.work_on_task(task_idx, 2)
                     
-                    print(f"\nCompleted 2 hours of work on task: {selected_task.get('name', selected_task.get('assignment_name', 'Unnamed Task'))}")
+                    print(f"\n{Colors.GREEN}Completed 2 hours of work on task: {selected_task.get('name', selected_task.get('assignment_name', 'Unnamed Task'))}{Colors.RESET}")
                     print(f"  Accumulated work time: {selected_task['completed_work']} hours")
                     print(f"  Remaining work time: {selected_task['duration_left']} hours")
                     print(f"  Effective work time before deadline: {selected_task['time_to_deadline']:.2f} hours")
@@ -733,7 +782,7 @@ class TaskScheduler:
                 print(f"Time advances: {old_date.strftime('%H:%M')} -> {self.current_date.strftime('%H:%M')}")
                 
                 # Print separator
-                print("\n" + "#" * 50)
+                print(f"\n{Colors.BOLD}{Colors.BACKGROUND_BLUE}{Colors.WHITE}" + "#" * 50 + f"{Colors.RESET}")
             else:
                 # Not during working hours, skip to next working time
                 old_date = self.current_date
@@ -741,7 +790,7 @@ class TaskScheduler:
                 print(f"Not during working hours, adjusted to: {old_date.strftime('%Y-%m-%d %H:%M')} -> {self.current_date.strftime('%Y-%m-%d %H:%M')}")
                 
                 # Print separator
-                print("\n" + "#" * 50)
+                print(f"\n{Colors.BOLD}{Colors.BACKGROUND_BLUE}{Colors.WHITE}" + "#" * 50 + f"{Colors.RESET}")
         
         # Display final results for all tasks
         print("\nFinal results for all tasks:")
@@ -764,11 +813,63 @@ class TaskScheduler:
 
 # Example usage
 if __name__ == "__main__":
-    # Create a scheduler with start date
+    # 获取用户输入的权重值
+    print(f"{Colors.BOLD}{Colors.BLUE}Please enter weight values for task priority calculation (between 0-1){Colors.RESET}")
+    
+    # 获取紧急度权重
+    while True:
+        try:
+            urgency_weight = float(input(f"{Colors.CYAN}Urgency weight (default 0.5): {Colors.RESET}") or "0.5")
+            if 0 <= urgency_weight <= 1:
+                break
+            else:
+                print(f"{Colors.RED}Please enter a value between 0 and 1{Colors.RESET}")
+        except ValueError:
+            print(f"{Colors.RED}Please enter a valid number{Colors.RESET}")
+    
+    # 获取重要性权重
+    while True:
+        try:
+            importance_weight = float(input(f"{Colors.CYAN}Importance weight (default 0.3): {Colors.RESET}") or "0.3")
+            if 0 <= importance_weight <= 1:
+                break
+            else:
+                print(f"{Colors.RED}Please enter a value between 0 and 1{Colors.RESET}")
+        except ValueError:
+            print(f"{Colors.RED}Please enter a valid number{Colors.RESET}")
+    
+    # 获取心情权重
+    while True:
+        try:
+            mood_weight = float(input(f"{Colors.CYAN}Mood weight (default 0.2): {Colors.RESET}") or "0.2")
+            if 0 <= mood_weight <= 1:
+                break
+            else:
+                print(f"{Colors.RED}Please enter a value between 0 and 1{Colors.RESET}")
+        except ValueError:
+            print(f"{Colors.RED}Please enter a valid number{Colors.RESET}")
+    
+    # 检查权重总和是否为1
+    total_weight = urgency_weight + importance_weight + mood_weight
+    if abs(total_weight - 1.0) > 0.01:  # 允许有小误差
+        print(f"{Colors.YELLOW}Warning: Weight sum is not 1 ({total_weight}), weights will be normalized{Colors.RESET}")
+        # 归一化权重
+        urgency_weight /= total_weight
+        importance_weight /= total_weight
+        mood_weight /= total_weight
+        print(f"Adjusted weights: Urgency={urgency_weight:.2f}, Importance={importance_weight:.2f}, Mood={mood_weight:.2f}")
+    
+    # Create a scheduler with start date and custom weights
     start_date = datetime(2025, 1, 1, 9, 00)
-    scheduler = TaskScheduler(start_date=start_date)
+    scheduler = TaskScheduler(
+        start_date=start_date,
+        urgency_weight=urgency_weight,
+        importance_weight=importance_weight,
+        mood_weight=mood_weight
+    )
     
     print(f"Initial time: {start_date.strftime('%Y-%m-%d %H:%M')}")
+    print(f"Using weights: Urgency={urgency_weight:.2f}, Importance={importance_weight:.2f}, Mood={mood_weight:.2f}")
     
     # Load tasks from JSON file
     num_tasks = scheduler.load_tasks_from_json('tj_simulator/eval_example_from_max.json')
